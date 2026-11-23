@@ -3,15 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/build-css.js && next dev",
+    "build": "node scripts/build-css.js && next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.3.5",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
+    "date-fns": "^4.4.0",
+    "file-saver": "^2.0.5",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.77.0",
+    "mysql2": "^3.24.6",
     "next": "16.4.6",
+    "next-auth": "^4.24.15",
+    "postcss": "^8.5.33",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "recharts": "^3.11.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
