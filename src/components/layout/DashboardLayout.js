@@ -32,14 +32,13 @@ export default function DashboardLayout({ children }) {
 
       {/* Main Content Area */}
       <div
-        className={`smooth-main min-h-screen flex flex-col ml-0 ${
-          collapsed ? 'lg:ml-[70px]' : 'lg:ml-[250px]'
-        }`}
+        className={`smooth-main min-h-screen flex flex-col ml-0 ${collapsed ? 'lg:ml-[70px]' : 'lg:ml-[250px]'
+          }`}
         suppressHydrationWarning
       >
         <TopNav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
         <main
-          className="p-3.5 sm:p-5 lg:p-6 flex-1 relative z-10 max-w-[1600px] w-full mx-auto animate-pageEnter"
+          className="p-3.5 sm:p-5 lg:p-6 flex-1 relative z-10 max-w-[1600px] w-full mx-auto"
           suppressHydrationWarning
         >
           {children}

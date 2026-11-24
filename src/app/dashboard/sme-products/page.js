@@ -611,12 +611,13 @@ export default function SmeProductsPage() {
         </div>
       </div>
 
-      {/* Add / Edit Modal */}
+            {/* Add / Edit Modal */}
       <Modal
         open={isAddOpen || isEditOpen}
         onClose={() => { setIsAddOpen(false); setIsEditOpen(false); }}
         title={isAddOpen ? t('registerSMEProduct') : (lang === 'kh' ? 'កែប្រែផលិតផលសហគ្រាស' : 'Edit SME Product')}
-        size="md"
+        description={lang === 'kh' ? 'បំពេញព័ត៌មានតាមជួរខាងក្រោមដើម្បីចុះបញ្ជីគំរូផលិតផលសហគ្រាស' : 'Fill in the specifications below to register SME sample product'}
+        size="xl"
         footer={
           <>
             <Button variant="outline" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }} disabled={submitting}>
@@ -628,121 +629,135 @@ export default function SmeProductsPage() {
           </>
         }
       >
-        <form onSubmit={isAddOpen ? handleSubmitAdd : handleSubmitEdit} className="space-y-3.5">
-          {/* Photo Upload Section */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start pb-3 border-b border-border-light">
-            <ImageUpload
-              value={formData.image_url}
-              onChange={(url, pid) => setFormData(prev => ({
-                ...prev,
-                image_url: url || '',
-                image_public_id: pid !== undefined ? pid : prev.image_public_id || ''
-              }))}
-              label={t('photo')}
-              folder="sme-products"
-            />
-            <div className="flex-1 space-y-3 w-full">
+        <form onSubmit={isAddOpen ? handleSubmitAdd : handleSubmitEdit} className="space-y-2.5">
+          {/* Row 1: Photo & Enterprise / Product Identification */}
+          <div className="bg-white rounded-xl border border-border p-3 flex flex-col sm:flex-row gap-3 items-stretch shadow-2xs">
+            {/* Compact Photo Upload Box */}
+            <div className="w-full sm:w-28 shrink-0 flex flex-col justify-center">
+              <ImageUpload
+                value={formData.image_url}
+                onChange={(url, pid) => setFormData(prev => ({
+                  ...prev,
+                  image_url: url || '',
+                  image_public_id: pid !== undefined ? pid : prev.image_public_id || ''
+                }))}
+                label=""
+                folder="sme-products"
+                compact={true}
+                className="w-full h-full min-h-[102px]"
+              />
+            </div>
+
+            {/* Core Enterprise, Product, Category & Status */}
+            <div className="flex-1 min-w-0 flex flex-col justify-between gap-2">
+              {/* Row 1a: SME Name & Product Name */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Input
+                  label={t('smeName')}
+                  required
+                  placeholder="e.g. Chey Cashew Enterprise, Prasat Honey"
+                  value={formData.sme_name}
+                  onChange={(e) => setFormData({ ...formData, sme_name: e.target.value })}
+                />
+                <Input
+                  label={t('productName')}
+                  required
+                  placeholder="e.g. Roasted Cashews 250g, Lotus Silk Scarf"
+                  value={formData.product_name}
+                  onChange={(e) => setFormData({ ...formData, product_name: e.target.value })}
+                />
+              </div>
+
+              {/* Row 1b: Category & Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Select
+                  label={t('category')}
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  options={[
+                    { value: 'Food & Agriculture', label: lang === 'kh' ? 'ចំណីអាហារ & កសិកម្ម' : 'Food & Agriculture' },
+                    { value: 'Handicraft & Textiles', label: lang === 'kh' ? 'សិប្បកម្ម & វាយនភណ្ឌ' : 'Handicraft & Textiles' },
+                    { value: 'Packaging Prototype', label: lang === 'kh' ? 'គំរូសំបកវេចខ្ចប់' : 'Packaging Prototype' },
+                    { value: 'Cosmetics & Wellness', label: lang === 'kh' ? 'គ្រឿងសម្អាង & សុខុមាលភាព' : 'Cosmetics & Wellness' },
+                    { value: 'Eco Technology', label: lang === 'kh' ? 'បច្ចេកវិទ្យាបៃតង' : 'Eco Technology' },
+                  ]}
+                />
+                <Select
+                  label={t('status')}
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  options={[
+                    { value: 'active', label: lang === 'kh' ? 'គំរូសកម្ម' : 'Active Sample' },
+                    { value: 'expired', label: t('expired') },
+                    { value: 'archived', label: lang === 'kh' ? 'រក្សាទុក' : 'Archived' },
+                    { value: 'returned', label: lang === 'kh' ? 'សងទៅសហគ្រាស' : 'Returned to SME' },
+                    { value: 'disposed', label: lang === 'kh' ? 'បានបោះបង់' : 'Disposed' },
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2: Quantity, Unit, Received Date & Location (4 columns in 1 single horizontal row) */}
+          <div className="bg-white rounded-xl border border-border p-3 shadow-2xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <Input
-                label={t('smeName')}
-                required
-                placeholder="e.g. Chey Cashew Enterprise, Prasat Honey"
-                value={formData.sme_name}
-                onChange={(e) => setFormData({ ...formData, sme_name: e.target.value })}
+                label={t('quantity')}
+                type="number"
+                min="0"
+                value={formData.quantity}
+                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
               />
               <Input
-                label={t('productName')}
-                required
-                placeholder="e.g. Roasted Cashews 250g, Lotus Silk Scarf"
-                value={formData.product_name}
-                onChange={(e) => setFormData({ ...formData, product_name: e.target.value })}
+                label={t('unit')}
+                placeholder="pcs, packs, bottles..."
+                value={formData.unit}
+                onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              />
+              <Input
+                label={lang === 'kh' ? 'កាលបរិច្ឆេទទទួល' : 'Date Received'}
+                type="date"
+                value={formData.received_date}
+                onChange={(e) => setFormData({ ...formData, received_date: e.target.value })}
+              />
+              <Input
+                label={lang === 'kh' ? 'ទីតាំងតាំងបង្ហាញ' : 'Sample Location'}
+                placeholder="e.g. Showcase Shelf 2, Food Lab"
+                value={formData.sample_location}
+                onChange={(e) => setFormData({ ...formData, sample_location: e.target.value })}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3.5">
-            <Select
-              label={t('category')}
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              options={[
-                { value: 'Food & Agriculture', label: lang === 'kh' ? 'ចំណីអាហារ & កសិកម្ម' : 'Food & Agriculture' },
-                { value: 'Handicraft & Textiles', label: lang === 'kh' ? 'សិប្បកម្ម & វាយនភណ្ឌ' : 'Handicraft & Textiles' },
-                { value: 'Packaging Prototype', label: lang === 'kh' ? 'គំរូសំបកវេចខ្ចប់' : 'Packaging Prototype' },
-                { value: 'Cosmetics & Wellness', label: lang === 'kh' ? 'គ្រឿងសម្អាង & សុខុមាលភាព' : 'Cosmetics & Wellness' },
-                { value: 'Eco Technology', label: lang === 'kh' ? 'បច្ចេកវិទ្យាបៃតង' : 'Eco Technology' },
-              ]}
-            />
-            <Select
-              label={t('status')}
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              options={[
-                { value: 'active', label: lang === 'kh' ? 'គំរូសកម្ម' : 'Active Sample' },
-                { value: 'expired', label: t('expired') },
-                { value: 'archived', label: lang === 'kh' ? 'រក្សាទុក' : 'Archived' },
-                { value: 'returned', label: lang === 'kh' ? 'សងទៅសហគ្រាស' : 'Returned to SME' },
-                { value: 'disposed', label: lang === 'kh' ? 'បានបោះបង់' : 'Disposed' },
-              ]}
-            />
-          </div>
-
-          {/* Expiration & Shelf-Life Dates */}
-          <div className="p-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-border space-y-2">
-            <span className="text-[11px] font-semibold text-text-main flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5 text-primary" />
-              {lang === 'kh' ? 'កាលបរិច្ឆេទផលិត & ផុតកំណត់ (សម្រាប់ផលិតផលកែច្នៃ)' : 'Manufacturing & Expiration Dates (Perishables)'}
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input
-                label={t('mfgDate')}
-                type="date"
-                value={formData.mfg_date}
-                onChange={(e) => setFormData({ ...formData, mfg_date: e.target.value })}
-              />
-              <Input
-                label={t('expiryDate')}
-                type="date"
-                value={formData.expiry_date}
-                onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
-              />
+          {/* Row 3: Manufacturing Date, Expiration Date & Description / Notes */}
+          <div className="bg-white rounded-xl border border-border p-3 shadow-2xs">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+              <div className="sm:col-span-3">
+                <Input
+                  label={t('mfgDate')}
+                  type="date"
+                  value={formData.mfg_date}
+                  onChange={(e) => setFormData({ ...formData, mfg_date: e.target.value })}
+                />
+              </div>
+              <div className="sm:col-span-3">
+                <Input
+                  label={t('expiryDate')}
+                  type="date"
+                  value={formData.expiry_date}
+                  onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
+                />
+              </div>
+              <div className="sm:col-span-6">
+                <Input
+                  label={lang === 'kh' ? 'ការពិពណ៌នាផលិតផល & កំណត់សម្គាល់' : 'Product Description & Trial Notes'}
+                  placeholder={lang === 'kh' ? 'ការវេចខ្ចប់ គ្រឿងផ្សំ កំណត់សម្គាល់...' : 'Packaging specs, ingredients, notes...'}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+              </div>
             </div>
           </div>
-
-          <div className="grid grid-cols-3 gap-3.5">
-            <Input
-              label={t('quantity')}
-              type="number"
-              min="0"
-              value={formData.quantity}
-              onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
-            />
-            <Input
-              label={t('unit')}
-              value={formData.unit}
-              onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-            />
-            <Input
-              label={lang === 'kh' ? 'កាលបរិច្ឆេទទទួល' : 'Date Received'}
-              type="date"
-              value={formData.received_date}
-              onChange={(e) => setFormData({ ...formData, received_date: e.target.value })}
-            />
-          </div>
-
-          <Input
-            label={lang === 'kh' ? 'ទីតាំងតាំងបង្ហាញក្នុង InnoLab' : 'Sample Location in InnoLab'}
-            placeholder="e.g. Showcase Shelf 2, Food Lab"
-            value={formData.sample_location}
-            onChange={(e) => setFormData({ ...formData, sample_location: e.target.value })}
-          />
-
-          <Textarea
-            label={lang === 'kh' ? 'ការពិពណ៌នាផលិតផល & កំណត់សម្គាល់ពិសោធន៍' : 'Product Description & Trial Notes'}
-            rows={2}
-            placeholder="Packaging specifications, ingredients, quality test notes..."
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
         </form>
       </Modal>
 
@@ -751,105 +766,139 @@ export default function SmeProductsPage() {
         open={isViewOpen}
         onClose={() => setIsViewOpen(false)}
         title={lang === 'kh' ? 'ព័ត៌មានលម្អិតគំរូផលិតផលសហគ្រាស' : 'SME Product Sample Details'}
-        size="md"
-        footer={<Button variant="outline" onClick={() => setIsViewOpen(false)}>{t('close')}</Button>}
+        size="xl"
+        footer={<Button variant="outline" size="sm" onClick={() => setIsViewOpen(false)}>{t('close')}</Button>}
       >
         {selectedProduct && (
-          <div className="space-y-4 text-xs">
-            {/* Primary Image & Header Info */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start p-3 bg-white/[0.03] rounded-2xl border border-white/8">
-              <div className="relative group/smeview w-24 h-24 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.02] border border-white/15 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-lg backdrop-blur-xl">
-                {selectedProduct.image_url ? (
-                  <>
-                    <img
-                      src={selectedProduct.image_url}
-                      alt={selectedProduct.product_name}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover/smeview:scale-105"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                    {selectedProduct.image_url.includes('cloudinary') && (
-                      <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-cyan-950/85 border border-cyan-400/40 text-cyan-300 backdrop-blur-md flex items-center gap-1 shadow-sm">
-                        <span className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse" />
-                        Cloud
-                      </div>
-                    )}
-                  </>
-                ) : null}
-                <div className={`text-center p-2 text-text-muted ${selectedProduct.image_url ? 'hidden' : 'block'}`}>
-                  <ImageIcon className="h-6 w-6 mx-auto mb-1 opacity-50 text-cyan-400" />
-                  <span className="text-[10px]">{lang === 'kh' ? 'គ្មានរូប' : 'No photo'}</span>
+          <div className="space-y-3">
+            {/* Top Row: Left Column (Media & Status) + Right Column (Info & Specifications) */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+              {/* Left Column: Image Preview + Status & Shelf-Life Card */}
+              <div className="w-full sm:w-56 shrink-0 bg-white rounded-xl border border-border p-3 flex flex-col items-center justify-between gap-2 shadow-2xs">
+                {/* Photo Preview */}
+                <div className="relative group/smeview w-full h-32 rounded-lg bg-neutral-50 border border-border flex items-center justify-center overflow-hidden">
+                  {selectedProduct.image_url ? (
+                    <>
+                      <img
+                        src={selectedProduct.image_url}
+                        alt={selectedProduct.product_name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover/smeview:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                      {selectedProduct.image_url.includes('cloudinary') && (
+                        <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-cyan-950/85 border border-cyan-400/40 text-cyan-300 backdrop-blur-md flex items-center gap-1 shadow-sm">
+                          <span className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse" />
+                          Cloud
+                        </div>
+                      )}
+                    </>
+                  ) : null}
+                  <div className={`w-full h-full flex flex-col items-center justify-center text-text-muted ${selectedProduct.image_url ? 'hidden' : 'flex'}`}>
+                    <ImageIcon className="h-7 w-7 text-text-muted/60 mb-0.5" />
+                    <span className="text-[10px] text-text-muted">{lang === 'kh' ? 'គ្មានរូប' : 'No photo'}</span>
+                  </div>
+                </div>
+
+                {/* Status Badges */}
+                <div className="w-full flex items-center justify-between gap-1.5">
+                  {getStatusBadge(selectedProduct.status)}
+                  {(() => {
+                    const expInfo = getExpiryInfo(selectedProduct);
+                    return <Badge variant={expInfo.variant} size="xs">{expInfo.label}</Badge>;
+                  })()}
+                </div>
+
+                {/* Shelf-Life Mini Card */}
+                <div className="w-full bg-neutral-50 rounded-lg p-2 border border-border/80 text-[11px] space-y-1">
+                  <div className="flex items-center justify-between text-text-muted">
+                    <span>{t('mfgDate')}:</span>
+                    <span className="font-semibold text-text-main">
+                      {selectedProduct.mfg_date ? selectedProduct.mfg_date.split('T')[0] : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-text-muted">
+                    <span>{t('expiryDate')}:</span>
+                    <span className="font-semibold text-text-main">
+                      {selectedProduct.expiry_date ? selectedProduct.expiry_date.split('T')[0] : (lang === 'kh' ? 'គ្មានកំណត់' : 'Non-perish')}
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="flex-1">
-                <span className="text-text-muted uppercase text-[10px] tracking-wider">{lang === 'kh' ? 'សហគ្រាសដៃគូ' : 'Partner Enterprise'}</span>
-                <h3 className="text-base font-bold text-white leading-snug">{selectedProduct.sme_name}</h3>
-                <p className="text-sm font-semibold text-cyan-400 mt-0.5">{selectedProduct.product_name}</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {getStatusBadge(selectedProduct.status)}
-                  <span className="px-2.5 py-0.5 bg-white/[0.06] text-white/90 text-[11px] rounded-full border border-white/10 font-medium">
+
+              {/* Right Column: Title + 3 Specifications + Description */}
+              <div className="flex-1 min-w-0 bg-white rounded-xl border border-border p-3.5 flex flex-col justify-between gap-2.5 shadow-2xs">
+                {/* Header Enterprise & Product Name */}
+                <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-2">
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-text-muted">
+                      {selectedProduct.sme_name}
+                    </span>
+                    <h3 className="text-base font-bold text-text-main leading-snug truncate">
+                      {selectedProduct.product_name}
+                    </h3>
+                  </div>
+                  <span className="text-xs font-medium text-primary px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 shrink-0">
                     {selectedProduct.category}
                   </span>
                 </div>
+
+                {/* Specifications in 3 horizontal row cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                      <ShoppingBag className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{t('quantity')}</p>
+                      <p className="text-xs font-bold text-text-main truncate">{selectedProduct.quantity} {selectedProduct.unit}</p>
+                    </div>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
+                      <Calendar className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{lang === 'kh' ? 'កាលបរិច្ឆេទទទួល' : 'Date Received'}</p>
+                      <p className="text-xs font-semibold text-text-main truncate">
+                        {selectedProduct.received_date ? selectedProduct.received_date.split('T')[0] : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                      <MapPin className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{t('location')}</p>
+                      <p className="text-xs font-semibold text-text-main truncate">
+                        {selectedProduct.sample_location || 'Showcase Shelf'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description Row */}
+                {selectedProduct.description && (
+                  <div className="rounded-lg bg-neutral-50/80 border border-border/70 px-3 py-2 flex items-start gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">{t('description')}</p>
+                      <p className="text-xs text-text-main leading-snug line-clamp-2">
+                        {selectedProduct.description}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Product Meta Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-              <div className="p-2.5 bg-bg-main rounded-lg">
-                <span className="text-text-muted block text-[10px]">{t('quantity')}</span>
-                <p className="font-bold text-text-main text-xs mt-0.5">{selectedProduct.quantity} {selectedProduct.unit}</p>
-              </div>
-              <div className="p-2.5 bg-bg-main rounded-lg">
-                <span className="text-text-muted block text-[10px]">{lang === 'kh' ? 'កាលបរិច្ឆេទទទួល' : 'Received Date'}</span>
-                <p className="font-medium text-text-main text-xs mt-0.5">{selectedProduct.received_date ? selectedProduct.received_date.split('T')[0] : 'N/A'}</p>
-              </div>
-              <div className="p-2.5 bg-bg-main rounded-lg col-span-2 sm:col-span-1">
-                <span className="text-text-muted block text-[10px]">{t('location')}</span>
-                <p className="font-medium text-text-main text-xs mt-0.5">{selectedProduct.sample_location || 'Showcase Shelf'}</p>
-              </div>
-            </div>
-
-            {/* Shelf-Life & Expiration Info */}
-            <div className="p-3 bg-black/[0.02] dark:bg-white/[0.03] rounded-xl border border-border space-y-2">
+            {/* Gallery Section */}
+            <div className="bg-white rounded-xl border border-border p-3 shadow-2xs space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
-                  <Clock className="h-3 w-3 text-primary" />
-                  {t('shelfLife')}
-                </span>
-                {(() => {
-                  const expInfo = getExpiryInfo(selectedProduct);
-                  return <Badge variant={expInfo.variant} size="xs">{expInfo.label}</Badge>;
-                })()}
-              </div>
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <div className="p-2 bg-bg-main rounded-lg">
-                  <span className="text-text-muted block text-[10px]">{t('mfgDate')}</span>
-                  <p className="font-semibold text-text-main text-xs mt-0.5">
-                    {selectedProduct.mfg_date ? selectedProduct.mfg_date.split('T')[0] : 'N/A'}
-                  </p>
-                </div>
-                <div className="p-2 bg-bg-main rounded-lg">
-                  <span className="text-text-muted block text-[10px]">{t('expiryDate')}</span>
-                  <p className="font-semibold text-text-main text-xs mt-0.5">
-                    {selectedProduct.expiry_date ? selectedProduct.expiry_date.split('T')[0] : (lang === 'kh' ? 'គ្មានកាលកំណត់' : 'Non-perishable')}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {selectedProduct.description && (
-              <div className="p-3 bg-bg-main/50 rounded-lg border border-border-light">
-                <span className="text-text-muted font-medium text-[10px] uppercase block mb-1">{t('description')}</span>
-                <p className="leading-relaxed text-text-main">{selectedProduct.description}</p>
-              </div>
-            )}
-
-            {/* Additional Photos / Multi-Image Gallery */}
-            <div className="border-t border-border-light pt-3">
-              <div className="flex items-center justify-between mb-2">
                 <div>
                   <h4 className="text-xs font-bold text-text-main">
                     {lang === 'kh' ? 'កម្រងរូបភាពគំរូ & ដំណើរការពិសោធន៍' : 'Sample Photos & Testing Gallery'}
@@ -860,54 +909,59 @@ export default function SmeProductsPage() {
                 </div>
               </div>
 
-              {/* Gallery Image Upload */}
-              <div className="mb-3">
-                <ImageUpload
-                  value=""
-                  onChange={handleAddGalleryImage}
-                  label={lang === 'kh' ? '+ បន្ថែមរូបភាពគំរូថ្មី' : '+ Add Additional Photo'}
-                  folder="sme-gallery"
-                />
-              </div>
-
-              {/* Photos List */}
-              {loadingGallery ? (
-                <p className="text-center text-text-muted py-2">{t('loading')}</p>
-              ) : galleryImages.length > 0 ? (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                  {galleryImages.map((img) => (
-                    <div key={img.id} className="relative group rounded-lg overflow-hidden border border-border bg-bg-main aspect-square">
-                      <img
-                        src={img.image_url}
-                        alt={img.caption || 'Product Photo'}
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        onClick={() => handleDeleteGalleryImage(img.id)}
-                        className="absolute top-1 right-1 p-1 bg-danger text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                        title="Delete photo"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                      {img.caption && (
-                        <div className="absolute inset-x-0 bottom-0 bg-black/60 text-white text-[9px] px-1.5 py-0.5 truncate">
-                          {img.caption}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+              {/* Gallery Image Upload (compact) */}
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                <div className="w-full sm:w-auto shrink-0">
+                  <ImageUpload
+                    value=""
+                    onChange={handleAddGalleryImage}
+                    label=""
+                    compact={true}
+                    folder="sme-gallery"
+                    className="w-24 h-20"
+                  />
                 </div>
-              ) : (
-                <p className="text-[11px] text-text-muted italic py-1">
-                  {lang === 'kh' ? 'មិនទាន់មានរូបភាពគំរូបន្ថែមនៅឡើយទេ។ អ្នកអាចបង្ហោះខាងលើ។' : 'No additional gallery photos yet. Upload one above.'}
-                </p>
-              )}
+                {/* Photos List */}
+                <div className="flex-1 min-w-0 w-full">
+                  {loadingGallery ? (
+                    <p className="text-center text-text-muted py-2 text-xs">{t('loading')}</p>
+                  ) : galleryImages.length > 0 ? (
+                    <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-thin">
+                      {galleryImages.map((img) => (
+                        <div key={img.id} className="relative group rounded-lg overflow-hidden border border-border bg-neutral-50 w-20 h-20 shrink-0">
+                          <img
+                            src={img.image_url}
+                            alt={img.caption || 'Product Photo'}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            onClick={() => handleDeleteGalleryImage(img.id)}
+                            className="absolute top-1 right-1 p-1 bg-danger text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                            title="Delete photo"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                          {img.caption && (
+                            <div className="absolute inset-x-0 bottom-0 bg-black/60 text-white text-[9px] px-1 py-0.5 truncate">
+                              {img.caption}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-text-muted italic py-2 pl-2">
+                      {lang === 'kh' ? 'មិនទាន់មានរូបភាពគំរូបន្ថែមនៅឡើយទេ។ អ្នកអាចបង្ហោះនៅខាងឆ្វេង។' : 'No additional gallery photos yet. Upload using the box on the left.'}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
       </Modal>
 
-      {/* Delete confirmation */}
+{/* Delete confirmation */}
       <ConfirmModal
         open={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}

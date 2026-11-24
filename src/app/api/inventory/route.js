@@ -4,7 +4,7 @@ import { success, created, error, badRequest, parsePagination, paginated } from 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     if (searchParams.get('all') === 'true') {
       const items = await query(`
         SELECT id, item_code, name, quantity, unit, status, location, image_url, image_public_id

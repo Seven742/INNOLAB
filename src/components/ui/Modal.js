@@ -19,11 +19,14 @@ export default function Modal({
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     }
     return () => {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     };
   }, [open]);
 
@@ -50,22 +53,40 @@ export default function Modal({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 modal-overlay animate-fadeIn"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflowY: 'auto',
+        background: 'rgba(15, 23, 42, 0.5)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+      }}
+      className="animate-fadeIn p-4 sm:p-6 lg:pl-[260px]"
       onClick={(e) => {
         if (closeOnOverlay && e.target === overlayRef.current) {
           onClose();
         }
+      }}
+      onWheel={(e) => {
+        e.stopPropagation();
       }}
     >
       <div
         className={`
           w-full ${sizeClasses[size] || sizeClasses.md}
           bg-bg-surface border border-border rounded-2xl shadow-2xl
-          overflow-hidden animate-slideUp backdrop-blur-2xl
+          overflow-hidden animate-slideUp backdrop-blur-2xl my-auto
         `}
       >
         {/* Header */}
-        <div className="flex items-start justify-between px-5 sm:px-6 py-4 border-b border-border bg-black/[0.02] dark:bg-black/[0.2]">
+        <div className="flex items-start justify-between px-5 sm:px-6 py-3.5 border-b border-border bg-black/[0.02]">
           <div>
             <h2 className="text-sm font-semibold text-text-main tracking-tight">{title}</h2>
             {description && (
@@ -74,20 +95,20 @@ export default function Modal({
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-text-muted hover:text-text-main hover:bg-black/[0.05] dark:hover:bg-white/[0.06] transition-colors -mr-1"
+            className="p-1 rounded-lg text-text-muted hover:text-text-main hover:bg-black/[0.05] transition-colors -mr-1"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-4 sm:p-6 max-h-[75vh] overflow-y-auto">
+        <div className="p-3.5 sm:p-4 max-h-[85vh] overflow-y-auto">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex flex-wrap items-center justify-end gap-2 px-5 sm:px-6 py-3.5 border-t border-border bg-black/[0.02] dark:bg-black/[0.2]">
+          <div className="flex flex-wrap items-center justify-end gap-2 px-5 sm:px-6 py-3 border-t border-border bg-black/[0.02]">
             {footer}
           </div>
         )}

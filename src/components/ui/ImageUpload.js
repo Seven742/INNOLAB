@@ -118,8 +118,8 @@ export default function ImageUpload({
         onDragLeave={handleDragLeave}
         className={`
           relative rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden
-          ${dragActive 
-            ? 'border-primary bg-primary/10 scale-[1.01] shadow-lg' 
+          ${dragActive
+            ? 'border-primary bg-primary/10 scale-[1.01] shadow-lg'
             : 'border-border hover:border-primary/50 hover:shadow-sm bg-black/[0.02] dark:bg-white/[0.04]'}
           ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
           ${aspectRatio === 'video' ? 'aspect-video' : 'aspect-square max-w-[210px]'}

@@ -11,6 +11,16 @@ import {
   Eye,
   MapPin,
   ImageIcon,
+  FolderTree,
+  DollarSign,
+  Calendar,
+  Truck,
+  FileText,
+  AlertTriangle,
+  Layers,
+  Tag,
+  Barcode,
+  CheckCircle2,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -29,18 +39,18 @@ export default function InventoryPage() {
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 1 });
-  
+
   // Filters & search
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState('DESC');
-  
+
   // UI states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Modals
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -434,13 +444,12 @@ export default function InventoryPage() {
                             </div>
                             <div className="w-full h-1.5 bg-black/[0.08] dark:bg-white/10 rounded-full overflow-hidden">
                               <div
-                                className={`h-full rounded-full transition-all duration-300 ${
-                                  item.quantity === 0
-                                    ? 'bg-danger'
-                                    : item.quantity <= item.min_stock_level
+                                className={`h-full rounded-full transition-all duration-300 ${item.quantity === 0
+                                  ? 'bg-danger'
+                                  : item.quantity <= item.min_stock_level
                                     ? 'bg-warning'
                                     : 'bg-primary-light'
-                                }`}
+                                  }`}
                                 style={{ width: `${item.quantity === 0 ? 100 : Math.max(pct, 5)}%` }}
                               />
                             </div>
@@ -554,13 +563,12 @@ export default function InventoryPage() {
                       </div>
                       <div className="w-full h-1.5 bg-black/[0.08] dark:bg-white/10 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-300 ${
-                            item.quantity === 0
-                              ? 'bg-danger'
-                              : item.quantity <= item.min_stock_level
+                          className={`h-full rounded-full transition-all duration-300 ${item.quantity === 0
+                            ? 'bg-danger'
+                            : item.quantity <= item.min_stock_level
                               ? 'bg-warning'
                               : 'bg-primary-light'
-                          }`}
+                            }`}
                           style={{ width: `${item.quantity === 0 ? 100 : Math.max(pct, 5)}%` }}
                         />
                       </div>
@@ -615,8 +623,8 @@ export default function InventoryPage() {
         open={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         title={t('addNewItem')}
-        description={t('inventorySubtitle')}
-        size="lg"
+        description={lang === 'kh' ? 'បំពេញព័ត៌មានតាមជួរខាងក្រោមដើម្បីចុះបញ្ជីទំនិញថ្មី' : 'Fill in the specifications below to register a new inventory item'}
+        size="xl"
         footer={
           <>
             <Button variant="outline" onClick={() => setIsAddOpen(false)} disabled={submitting}>
@@ -628,109 +636,136 @@ export default function InventoryPage() {
           </>
         }
       >
-        <form onSubmit={handleSubmitAdd} className="space-y-4">
-          {/* Photo Upload Section */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start pb-2 border-b border-border-light">
-            <ImageUpload
-              value={formData.image_url}
-              onChange={(url, pid) => setFormData(prev => ({
-                ...prev,
-                image_url: url || '',
-                image_public_id: pid !== undefined ? pid : prev.image_public_id || ''
-              }))}
-              label={t('photo')}
-              folder="inventory"
-            />
-            <div className="flex-1 space-y-3 w-full">
+        <form onSubmit={handleSubmitAdd} className="space-y-2.5">
+          {/* Row 1: Photo & Core Identifiers & Categorization */}
+          <div className="bg-white rounded-xl border border-border p-3 flex flex-col sm:flex-row gap-3 items-stretch shadow-2xs">
+            {/* Compact Photo Upload Box */}
+            <div className="w-full sm:w-28 shrink-0 flex flex-col justify-center">
+              <ImageUpload
+                value={formData.image_url}
+                onChange={(url, pid) => setFormData(prev => ({
+                  ...prev,
+                  image_url: url || '',
+                  image_public_id: pid !== undefined ? pid : prev.image_public_id || ''
+                }))}
+                label=""
+                folder="inventory"
+                compact={true}
+                className="w-full h-full min-h-[102px]"
+              />
+            </div>
+
+            {/* Core Identification and Location Fields */}
+            <div className="flex-1 min-w-0 flex flex-col justify-between gap-2">
+              {/* Row 1a: Name and Item Code */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                <div className="sm:col-span-8">
+                  <Input
+                    label={t('itemName')}
+                    required
+                    placeholder="e.g. Double A A4 Paper 80gsm, Dell Latitude Laptop..."
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+                <div className="sm:col-span-4">
+                  <Input
+                    label={t('itemCode')}
+                    placeholder="INV-XXXX (Auto)"
+                    value={formData.item_code}
+                    onChange={(e) => setFormData({ ...formData, item_code: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Row 1b: Category, Supplier, Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <Select
+                  label={t('category')}
+                  required
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                  options={categories.map(c => ({ value: String(c.id), label: c.name }))}
+                />
+                <Select
+                  label={t('supplier')}
+                  value={formData.supplier_id}
+                  onChange={(e) => setFormData({ ...formData, supplier_id: e.target.value })}
+                  options={[
+                    { value: '', label: lang === 'kh' ? 'គ្មាន / ផ្ទៃក្នុង' : 'None / Internal' },
+                    ...suppliers.map(s => ({ value: String(s.id), label: s.name })),
+                  ]}
+                />
+                <Input
+                  label={t('location')}
+                  placeholder="e.g. Shelf B-2, Room 102"
+                  leftIcon={<MapPin className="h-3.5 w-3.5" />}
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2: Stock Levels & Financials (4 items horizontal row) */}
+          <div className="bg-white rounded-xl border border-border p-3 shadow-2xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <Input
-                label={t('itemName')}
+                label={t('quantity')}
+                type="number"
+                min="0"
                 required
-                placeholder="e.g. A4 Paper, Dell Latitude Laptop..."
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="0"
+                value={formData.quantity}
+                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
               />
               <Input
-                label={t('itemCode')}
-                placeholder="INV-XXXX (Auto-generated if empty)"
-                value={formData.item_code}
-                onChange={(e) => setFormData({ ...formData, item_code: e.target.value })}
+                label={t('unit')}
+                placeholder="pcs, reams, boxes..."
+                value={formData.unit}
+                onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              />
+              <Input
+                label={t('minStockAlert')}
+                type="number"
+                min="0"
+                placeholder="5"
+                value={formData.min_stock_level}
+                onChange={(e) => setFormData({ ...formData, min_stock_level: parseInt(e.target.value) || 0 })}
+              />
+              <Input
+                label={t('purchasePrice')}
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                leftIcon={<DollarSign className="h-3.5 w-3.5" />}
+                value={formData.purchase_price}
+                onChange={(e) => setFormData({ ...formData, purchase_price: e.target.value })}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <Select
-              label={t('category')}
-              required
-              value={formData.category_id}
-              onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-              options={categories.map(c => ({ value: String(c.id), label: c.name }))}
-            />
-            <Select
-              label={t('supplier')}
-              value={formData.supplier_id}
-              onChange={(e) => setFormData({ ...formData, supplier_id: e.target.value })}
-              options={[
-                { value: '', label: 'None / Internal' },
-                ...suppliers.map(s => ({ value: String(s.id), label: s.name })),
-              ]}
-            />
+          {/* Row 3: Purchase Date & Description (compact single horizontal row) */}
+          <div className="bg-white rounded-xl border border-border p-3 shadow-2xs">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+              <div className="sm:col-span-4">
+                <Input
+                  label={t('purchaseDate')}
+                  type="date"
+                  value={formData.purchase_date}
+                  onChange={(e) => setFormData({ ...formData, purchase_date: e.target.value })}
+                />
+              </div>
+              <div className="sm:col-span-8">
+                <Input
+                  label={t('description')}
+                  placeholder={lang === 'kh' ? 'បញ្ចូលលក្ខណៈបច្ចេកទេស ឬកំណត់សម្គាល់...' : 'Enter specifications or notes...'}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+              </div>
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <Input
-              label={t('quantity')}
-              type="number"
-              min="0"
-              required
-              value={formData.quantity}
-              onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
-            />
-            <Input
-              label={t('unit')}
-              placeholder="pcs, reams, boxes..."
-              value={formData.unit}
-              onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-            />
-            <Input
-              label={t('minStockAlert')}
-              type="number"
-              min="0"
-              value={formData.min_stock_level}
-              onChange={(e) => setFormData({ ...formData, min_stock_level: parseInt(e.target.value) || 0 })}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <Input
-              label={t('location')}
-              placeholder="e.g. Shelf B-2, Cabinet 1"
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-            />
-            <Input
-              label={t('purchasePrice')}
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              value={formData.purchase_price}
-              onChange={(e) => setFormData({ ...formData, purchase_price: e.target.value })}
-            />
-            <Input
-              label={t('purchaseDate')}
-              type="date"
-              value={formData.purchase_date}
-              onChange={(e) => setFormData({ ...formData, purchase_date: e.target.value })}
-            />
-          </div>
-
-          <Textarea
-            label={t('description')}
-            rows={2}
-            placeholder="Specifications, model numbers, notes..."
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
         </form>
       </Modal>
 
@@ -738,8 +773,9 @@ export default function InventoryPage() {
       <Modal
         open={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        title={`${t('editItem')}: ${selectedItem?.item_code}`}
-        size="lg"
+        title={`${t('editItem')}: ${selectedItem?.item_code || ''}`}
+        description={lang === 'kh' ? 'កែប្រែទិន្នន័យ និងព័ត៌មានលម្អិតរបស់ទំនិញ' : 'Update item specifications and stock parameters'}
+        size="xl"
         footer={
           <>
             <Button variant="outline" onClick={() => setIsEditOpen(false)} disabled={submitting}>
@@ -751,107 +787,142 @@ export default function InventoryPage() {
           </>
         }
       >
-        <form onSubmit={handleSubmitEdit} className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4 items-start pb-2 border-b border-border-light">
-            <ImageUpload
-              value={formData.image_url}
-              onChange={(url, pid) => setFormData(prev => ({
-                ...prev,
-                image_url: url || '',
-                image_public_id: pid !== undefined ? pid : prev.image_public_id || ''
-              }))}
-              label={t('photo')}
-              folder="inventory"
-            />
-            <div className="flex-1 space-y-3 w-full">
-              <Input
-                label={t('itemName')}
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        <form onSubmit={handleSubmitEdit} className="space-y-2.5">
+          {/* Row 1: Photo & Core Identifiers & Categorization */}
+          <div className="bg-white rounded-xl border border-border p-3 flex flex-col sm:flex-row gap-3 items-stretch shadow-2xs">
+            {/* Compact Photo Upload Box */}
+            <div className="w-full sm:w-28 shrink-0 flex flex-col justify-center">
+              <ImageUpload
+                value={formData.image_url}
+                onChange={(url, pid) => setFormData(prev => ({
+                  ...prev,
+                  image_url: url || '',
+                  image_public_id: pid !== undefined ? pid : prev.image_public_id || ''
+                }))}
+                label=""
+                folder="inventory"
+                compact={true}
+                className="w-full h-full min-h-[102px]"
               />
-              <Select
-                label={t('status')}
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                options={[
-                  { value: 'in_stock', label: t('in_stock') },
-                  { value: 'low_stock', label: t('low_stock') },
-                  { value: 'out_of_stock', label: t('out_of_stock') },
-                  { value: 'discontinued', label: t('discontinued') },
-                ]}
+            </div>
+
+            {/* Core Identification and Location Fields */}
+            <div className="flex-1 min-w-0 flex flex-col justify-between gap-2">
+              {/* Row 1a: Name, Code (disabled), and Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                <div className="sm:col-span-6">
+                  <Input
+                    label={t('itemName')}
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+                <div className="sm:col-span-3">
+                  <Input
+                    label={t('itemCode')}
+                    disabled
+                    value={formData.item_code}
+                  />
+                </div>
+                <div className="sm:col-span-3">
+                  <Select
+                    label={t('status')}
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    options={[
+                      { value: 'in_stock', label: t('in_stock') },
+                      { value: 'low_stock', label: t('low_stock') },
+                      { value: 'out_of_stock', label: t('out_of_stock') },
+                      { value: 'discontinued', label: t('discontinued') },
+                    ]}
+                  />
+                </div>
+              </div>
+
+              {/* Row 1b: Category, Supplier, Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <Select
+                  label={t('category')}
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                  options={categories.map(c => ({ value: String(c.id), label: c.name }))}
+                />
+                <Select
+                  label={t('supplier')}
+                  value={formData.supplier_id}
+                  onChange={(e) => setFormData({ ...formData, supplier_id: e.target.value })}
+                  options={[
+                    { value: '', label: lang === 'kh' ? 'គ្មាន / ផ្ទៃក្នុង' : 'None / Internal' },
+                    ...suppliers.map(s => ({ value: String(s.id), label: s.name })),
+                  ]}
+                />
+                <Input
+                  label={t('location')}
+                  placeholder="e.g. Shelf B-2, Room 102"
+                  leftIcon={<MapPin className="h-3.5 w-3.5" />}
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2: Stock Levels & Financials (4 items horizontal row) */}
+          <div className="bg-white rounded-xl border border-border p-3 shadow-2xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <Input
+                label={t('quantity')}
+                type="number"
+                min="0"
+                required
+                value={formData.quantity}
+                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
+              />
+              <Input
+                label={t('unit')}
+                value={formData.unit}
+                onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              />
+              <Input
+                label={t('minStockAlert')}
+                type="number"
+                min="0"
+                value={formData.min_stock_level}
+                onChange={(e) => setFormData({ ...formData, min_stock_level: parseInt(e.target.value) || 0 })}
+              />
+              <Input
+                label={t('purchasePrice')}
+                type="number"
+                step="0.01"
+                leftIcon={<DollarSign className="h-3.5 w-3.5" />}
+                value={formData.purchase_price}
+                onChange={(e) => setFormData({ ...formData, purchase_price: e.target.value })}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <Select
-              label={t('category')}
-              value={formData.category_id}
-              onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-              options={categories.map(c => ({ value: String(c.id), label: c.name }))}
-            />
-            <Select
-              label={t('supplier')}
-              value={formData.supplier_id}
-              onChange={(e) => setFormData({ ...formData, supplier_id: e.target.value })}
-              options={[
-                { value: '', label: 'None / Internal' },
-                ...suppliers.map(s => ({ value: String(s.id), label: s.name })),
-              ]}
-            />
+          {/* Row 3: Purchase Date & Description (compact single horizontal row) */}
+          <div className="bg-white rounded-xl border border-border p-3 shadow-2xs">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+              <div className="sm:col-span-4">
+                <Input
+                  label={t('purchaseDate')}
+                  type="date"
+                  value={formData.purchase_date}
+                  onChange={(e) => setFormData({ ...formData, purchase_date: e.target.value })}
+                />
+              </div>
+              <div className="sm:col-span-8">
+                <Input
+                  label={t('description')}
+                  placeholder={lang === 'kh' ? 'បញ្ចូលលក្ខណៈបច្ចេកទេស ឬកំណត់សម្គាល់...' : 'Enter specifications or notes...'}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+              </div>
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <Input
-              label={t('quantity')}
-              type="number"
-              min="0"
-              required
-              value={formData.quantity}
-              onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
-            />
-            <Input
-              label={t('unit')}
-              value={formData.unit}
-              onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-            />
-            <Input
-              label={t('minStockAlert')}
-              type="number"
-              min="0"
-              value={formData.min_stock_level}
-              onChange={(e) => setFormData({ ...formData, min_stock_level: parseInt(e.target.value) || 0 })}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <Input
-              label={t('location')}
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-            />
-            <Input
-              label={t('purchasePrice')}
-              type="number"
-              step="0.01"
-              value={formData.purchase_price}
-              onChange={(e) => setFormData({ ...formData, purchase_price: e.target.value })}
-            />
-            <Input
-              label={t('purchaseDate')}
-              type="date"
-              value={formData.purchase_date}
-              onChange={(e) => setFormData({ ...formData, purchase_date: e.target.value })}
-            />
-          </div>
-
-          <Textarea
-            label={t('description')}
-            rows={2}
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
         </form>
       </Modal>
 
@@ -860,91 +931,206 @@ export default function InventoryPage() {
         open={isViewOpen}
         onClose={() => setIsViewOpen(false)}
         title={t('itemDetails')}
-        size="md"
+        size="xl"
         footer={
-          <Button variant="outline" onClick={() => setIsViewOpen(false)}>
-            {t('close')}
-          </Button>
+          <div className="flex items-center justify-between w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsViewOpen(false);
+                handleOpenEdit(selectedItem);
+              }}
+              className="gap-1.5"
+            >
+              <Edit2 className="h-3.5 w-3.5" />
+              {t('editItem')}
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setIsViewOpen(false)}>
+              {t('close')}
+            </Button>
+          </div>
         }
       >
         {selectedItem && (
-          <div className="space-y-4">
-            {/* Header + Photo Preview */}
-            <div className="flex gap-4 items-start border-b border-border-light pb-4">
-              <div className="relative group/preview w-24 h-24 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.02] border border-white/15 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-lg backdrop-blur-xl">
-                {selectedItem.image_url ? (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={selectedItem.image_url}
-                      alt={selectedItem.name}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover/preview:scale-105"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                    {selectedItem.image_url.includes('cloudinary') && (
-                      <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-cyan-950/85 border border-cyan-400/40 text-cyan-300 backdrop-blur-md flex items-center gap-1 shadow-sm">
-                        <span className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse" />
-                        Cloud
-                      </div>
-                    )}
-                  </>
-                ) : null}
-                <div className={`w-full h-full flex flex-col items-center justify-center text-text-muted ${selectedItem.image_url ? 'hidden' : 'flex'}`}>
-                  <Package className="h-8 w-8 text-text-muted mb-1" />
-                  <span className="text-[10px] text-text-muted">No Photo</span>
+          <div className="space-y-3">
+            {/* Main Row: Left Media Card + Right Executive Info Card */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+              {/* Left Column: Image & Status & Mini Gauge */}
+              <div className="w-full sm:w-56 shrink-0 bg-white rounded-xl border border-border p-3 flex flex-col items-center justify-between gap-2.5 shadow-2xs">
+                {/* Photo Preview */}
+                <div className="relative group/viewimg w-full h-32 rounded-lg bg-neutral-50 border border-border flex items-center justify-center overflow-hidden">
+                  {selectedItem.image_url ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={selectedItem.image_url}
+                        alt={selectedItem.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover/viewimg:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                      {selectedItem.image_url.includes('cloudinary') && (
+                        <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-cyan-950/85 border border-cyan-400/40 text-cyan-300 backdrop-blur-md flex items-center gap-1">
+                          <span className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse" />
+                          Cloud
+                        </div>
+                      )}
+                    </>
+                  ) : null}
+                  <div className={`w-full h-full flex flex-col items-center justify-center text-text-muted ${selectedItem.image_url ? 'hidden' : 'flex'}`}>
+                    <Package className="h-7 w-7 text-text-muted/60 mb-0.5" />
+                    <span className="text-[10px] text-text-muted">{lang === 'kh' ? 'គ្មានរូបថត' : 'No Photo'}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="font-mono text-xs font-bold text-primary">{selectedItem.item_code}</span>
-                <h3 className="text-base font-bold text-text-main mt-0.5 leading-tight">{selectedItem.name}</h3>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-xs text-text-secondary">{selectedItem.category_name || 'Unassigned'}</span>
-                  <span>·</span>
+
+                {/* Badges Row */}
+                <div className="w-full flex items-center justify-between gap-1.5">
+                  <span className="font-mono text-[11px] font-bold text-primary px-2 py-0.5 rounded bg-primary/10 border border-primary/20">
+                    {selectedItem.item_code}
+                  </span>
                   {getStatusBadge(selectedItem.status)}
                 </div>
+
+                {/* Mini Stock Gauge */}
+                <div className="w-full bg-neutral-50 rounded-lg p-2 border border-border/80">
+                  <div className="flex items-center justify-between text-[11px] mb-1">
+                    <span className="text-text-muted font-medium">{t('stockLevel')}</span>
+                    <span className="font-bold text-text-main">{selectedItem.quantity} {selectedItem.unit}</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-neutral-200 overflow-hidden">
+                    {(() => {
+                      const qty = Number(selectedItem.quantity) || 0;
+                      const min = Number(selectedItem.min_stock_level) || 0;
+                      let pct = min > 0 ? Math.min(Math.round((qty / (min * 2)) * 100), 100) : (qty > 0 ? 100 : 0);
+                      let colorClass = 'bg-emerald-500';
+                      if (qty === 0) {
+                        pct = 0;
+                        colorClass = 'bg-rose-500';
+                      } else if (qty <= min) {
+                        colorClass = 'bg-amber-500';
+                      }
+                      return (
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${colorClass}`}
+                          style={{ width: `${Math.max(pct, qty > 0 ? 8 : 0)}%` }}
+                        />
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Title + 6 Specifications + Description */}
+              <div className="flex-1 min-w-0 bg-white rounded-xl border border-border p-3.5 flex flex-col justify-between gap-2.5 shadow-2xs">
+                {/* Header Title + Category Pill */}
+                <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-2">
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-text-muted">
+                      {lang === 'kh' ? 'ព័ត៌មានលម្អិតនៃទំនិញ' : 'Item Specifications'}
+                    </span>
+                    <h3 className="text-base font-bold text-text-main leading-snug truncate">
+                      {selectedItem.name}
+                    </h3>
+                  </div>
+                  {selectedItem.category_name && (
+                    <span className="text-xs font-medium text-primary px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 shrink-0">
+                      {selectedItem.category_name}
+                    </span>
+                  )}
+                </div>
+
+                {/* 6 Key Specifications in a 3-column x 2-row clean grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {/* Spec 1: Quantity */}
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                      <Package className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{t('quantity')}</p>
+                      <p className="text-xs font-bold text-text-main truncate">{selectedItem.quantity} {selectedItem.unit}</p>
+                    </div>
+                  </div>
+
+                  {/* Spec 2: Min Stock Alert */}
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+                      <AlertTriangle className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{t('minStockAlert')}</p>
+                      <p className="text-xs font-semibold text-text-main truncate">{selectedItem.min_stock_level} {selectedItem.unit}</p>
+                    </div>
+                  </div>
+
+                  {/* Spec 3: Location */}
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                      <MapPin className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{t('location')}</p>
+                      <p className="text-xs font-semibold text-text-main truncate">{selectedItem.location || '—'}</p>
+                    </div>
+                  </div>
+
+                  {/* Spec 4: Purchase Price */}
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100">
+                      <DollarSign className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{t('purchasePrice')}</p>
+                      <p className="text-xs font-bold text-text-main truncate">
+                        {selectedItem.purchase_price ? `$${parseFloat(selectedItem.purchase_price).toFixed(2)}` : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Spec 5: Purchase Date */}
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
+                      <Calendar className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{t('purchaseDate')}</p>
+                      <p className="text-xs font-semibold text-text-main truncate">
+                        {selectedItem.purchase_date ? selectedItem.purchase_date.split('T')[0] : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Spec 6: Supplier */}
+                  <div className="p-2 rounded-lg bg-neutral-50/80 border border-border/70 flex items-center gap-2">
+                    <div className="w-6.5 h-6.5 rounded bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100">
+                      <Truck className="h-3 w-3" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-text-muted truncate">{t('supplier')}</p>
+                      <p className="text-xs font-semibold text-text-main truncate">
+                        {selectedItem.supplier_name || (lang === 'kh' ? 'ផ្ទៃក្នុង / គ្មាន' : 'Internal / None')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description Row */}
+                {selectedItem.description && (
+                  <div className="rounded-lg bg-neutral-50/80 border border-border/70 px-3 py-2 flex items-start gap-2">
+                    <FileText className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">{t('description')}</p>
+                      <p className="text-xs text-text-main leading-snug line-clamp-2">
+                        {selectedItem.description}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-2.5 bg-bg-main/60 rounded-lg">
-                <p className="text-text-muted">{t('quantity')}</p>
-                <p className="text-sm font-bold text-text-main mt-0.5">
-                  {selectedItem.quantity} {selectedItem.unit}
-                </p>
-              </div>
-              <div className="p-2.5 bg-bg-main/60 rounded-lg">
-                <p className="text-text-muted">{t('minStockAlert')}</p>
-                <p className="text-sm font-bold text-text-main mt-0.5">
-                  {selectedItem.min_stock_level} {selectedItem.unit}
-                </p>
-              </div>
-              <div className="p-2.5 bg-bg-main/60 rounded-lg">
-                <p className="text-text-muted">{t('location')}</p>
-                <p className="text-sm font-semibold text-text-main mt-0.5">{selectedItem.location || '—'}</p>
-              </div>
-              <div className="p-2.5 bg-bg-main/60 rounded-lg">
-                <p className="text-text-muted">{t('purchasePrice')}</p>
-                <p className="text-sm font-semibold text-text-main mt-0.5">
-                  {selectedItem.purchase_price ? `$${parseFloat(selectedItem.purchase_price).toFixed(2)}` : 'N/A'}
-                </p>
-              </div>
-              <div className="p-2.5 bg-bg-main/60 rounded-lg col-span-2">
-                <p className="text-text-muted">{t('supplier')}</p>
-                <p className="text-sm font-semibold text-text-main mt-0.5">{selectedItem.supplier_name || 'Internal / None'}</p>
-              </div>
-            </div>
-
-            {selectedItem.description && (
-              <div className="pt-2">
-                <p className="text-xs font-bold text-text-secondary mb-1">{t('description')}</p>
-                <p className="text-xs text-text-main leading-relaxed bg-bg-main/50 p-2.5 rounded-lg">
-                  {selectedItem.description}
-                </p>
-              </div>
-            )}
           </div>
         )}
       </Modal>
