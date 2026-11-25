@@ -68,7 +68,7 @@ export default function Modal({
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}
-      className="animate-fadeIn p-4 sm:p-6 lg:pl-[260px]"
+      className="animate-fadeIn p-4 sm:p-6"
       onClick={(e) => {
         if (closeOnOverlay && e.target === overlayRef.current) {
           onClose();

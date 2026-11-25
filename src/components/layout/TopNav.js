@@ -149,8 +149,8 @@ export default function TopNav({ mobileOpen, setMobileOpen }) {
                 <button
                   onClick={() => { setLang('en'); setShowLangMenu(false); }}
                   className={`w-full px-3 py-1.5 text-left text-xs rounded-lg flex items-center justify-between transition-colors ${lang === 'en'
-                      ? 'bg-primary/10 text-primary dark:text-cyan-300 font-semibold border border-primary/25'
-                      : 'text-text-secondary hover:bg-black/[0.04] dark:hover:bg-white/[0.05] hover:text-text-main'
+                    ? 'bg-primary/10 text-primary dark:text-cyan-300 font-semibold border border-primary/25'
+                    : 'text-text-secondary hover:bg-black/[0.04] dark:hover:bg-white/[0.05] hover:text-text-main'
                     }`}
                 >
                   <span className="flex items-center gap-2">
@@ -163,8 +163,8 @@ export default function TopNav({ mobileOpen, setMobileOpen }) {
                 <button
                   onClick={() => { setLang('kh'); setShowLangMenu(false); }}
                   className={`w-full px-3 py-1.5 text-left text-xs rounded-lg flex items-center justify-between transition-colors ${lang === 'kh'
-                      ? 'bg-primary/10 text-primary dark:text-cyan-300 font-semibold border border-primary/25'
-                      : 'text-text-secondary hover:bg-black/[0.04] dark:hover:bg-white/[0.05] hover:text-text-main'
+                    ? 'bg-primary/10 text-primary dark:text-cyan-300 font-semibold border border-primary/25'
+                    : 'text-text-secondary hover:bg-black/[0.04] dark:hover:bg-white/[0.05] hover:text-text-main'
                     }`}
                 >
                   <span className="flex items-center gap-2">
