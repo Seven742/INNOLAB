@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import Button from './Button';
 
@@ -15,6 +16,11 @@ export default function Modal({
   closeOnOverlay = true,
 }) {
   const overlayRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -40,7 +46,7 @@ export default function Modal({
     return () => window.removeEventListener('keydown', handleEsc);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
   const sizeClasses = {
     sm: 'max-w-md',
@@ -50,7 +56,7 @@ export default function Modal({
     full: 'max-w-[95vw]',
   };
 
-  return (
+  const modalContent = (
     <div
       ref={overlayRef}
       style={{
@@ -59,16 +65,16 @@ export default function Modal({
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 9999,
+        zIndex: 99999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         overflowY: 'auto',
-        background: 'rgba(15, 23, 42, 0.5)',
+        background: 'rgba(15, 23, 42, 0.6)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}
-      className="animate-fadeIn p-4 sm:p-6"
+      className="animate-fadeIn p-3.5 sm:p-6"
       onClick={(e) => {
         if (closeOnOverlay && e.target === overlayRef.current) {
           onClose();
@@ -87,22 +93,23 @@ export default function Modal({
       >
         {/* Header */}
         <div className="flex items-start justify-between px-5 sm:px-6 py-3.5 border-b border-border bg-black/[0.02]">
-          <div>
-            <h2 className="text-sm font-semibold text-text-main tracking-tight">{title}</h2>
+          <div className="pr-3">
+            <h2 className="text-sm sm:text-base font-semibold text-text-main tracking-tight leading-snug">{title}</h2>
             {description && (
-              <p className="text-xs text-text-muted mt-0.5">{description}</p>
+              <p className="text-xs text-text-muted mt-0.5 leading-normal">{description}</p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-text-muted hover:text-text-main hover:bg-black/[0.05] transition-colors -mr-1"
+            className="p-1.5 rounded-lg text-text-muted hover:text-text-main hover:bg-black/[0.05] transition-colors -mr-1 shrink-0"
+            aria-label="Close modal"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-3.5 sm:p-4 max-h-[85vh] overflow-y-auto">
+        <div className="p-3.5 sm:p-5 max-h-[72vh] sm:max-h-[78vh] overflow-y-auto">
           {children}
         </div>
 
@@ -115,6 +122,8 @@ export default function Modal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
 
 export function ConfirmModal({

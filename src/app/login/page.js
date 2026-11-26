@@ -275,7 +275,7 @@ function LoginForm() {
                 className=" rounded-xl flex items-center justify-center "
               // style={{ background: `${C.pageBg}60`, border: '1px solid rgba(255,255,255,0.2)' }}
               >
-                <img src="/logo.png" alt="InnoLab logo" className="h-full w-auto object-contain drop-shadow" />
+                <img src="/logo.png" alt="InnoLab logo" className="h-10 w-auto object-contain drop-shadow" />
               </div>
               {/* <div>
                 <p className="font-extrabold text-sm tracking-widest text-white leading-none">INNOLAB</p>
@@ -336,8 +336,8 @@ function LoginForm() {
             {/* Mobile header */}
             <div className="lg:hidden flex items-center justify-between mb-7">
               <div className="flex items-center gap-2">
-                <img src="/main-logo.png" alt="InnoLab" className="h-8 w-auto object-contain" />
-                <span className="font-extrabold text-sm tracking-widest text-white">INNOLAB</span>
+                <img src="/logo.png" alt="InnoLab" className="h-8 w-auto object-contain" />
+
               </div>
               <LangToggle lang={lang} setLang={setLang} />
             </div>
