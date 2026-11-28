@@ -74,20 +74,6 @@ A modern, responsive, full-stack inventory and asset management system designed 
 
 ---
 
-## Default Demo Accounts
-
-All pre-seeded demo accounts share the same default password:
-
-| Role | Email | Password | Access Level |
-|---|---|---|---|
-| **System Admin** | `admin@innolab.kh` | `admin123` | Full access (Inventory, Users, Settings) |
-| **Manager** | `manager@innolab.kh` | `admin123` | Inventory, Stock Movements, Reports |
-| **Staff** | `staff@innolab.kh` | `admin123` | Stock In/Out, Borrow/Return, Inventory View |
-
-> **Note:** The login page provides 1-click autofill buttons for these demo accounts in the *"Forgot password?"* modal.
-
----
-
 ## Getting Started
 
 ### Prerequisites
