@@ -1,9 +1,7 @@
 -- InnoLab Inventory Management System
 -- Database Schema for MySQL
-
 CREATE DATABASE IF NOT EXISTS innolab_inventory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE innolab_inventory;
-
 -- =====================================================
 -- Users & Authentication
 -- =====================================================
@@ -21,7 +19,6 @@ CREATE TABLE users (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 -- =====================================================
 -- Categories
 -- =====================================================
@@ -34,9 +31,9 @@ CREATE TABLE categories (
   item_count INT NOT NULL DEFAULT 0,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL
+  FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE
+  SET NULL
 );
-
 -- =====================================================
 -- Suppliers
 -- =====================================================
@@ -52,7 +49,6 @@ CREATE TABLE suppliers (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 -- =====================================================
 -- Inventory Items
 -- =====================================================
@@ -67,21 +63,28 @@ CREATE TABLE inventory_items (
   unit VARCHAR(30) NOT NULL DEFAULT 'pcs',
   min_stock_level INT NOT NULL DEFAULT 0,
   location VARCHAR(150),
-  purchase_price DECIMAL(12,2),
+  purchase_price DECIMAL(12, 2),
   supplier_id INT,
   purchase_date DATE,
-  status ENUM('in_stock', 'low_stock', 'out_of_stock', 'discontinued') NOT NULL DEFAULT 'in_stock',
+  status ENUM(
+    'in_stock',
+    'low_stock',
+    'out_of_stock',
+    'discontinued'
+  ) NOT NULL DEFAULT 'in_stock',
   created_by INT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
-  FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
-  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_item_code (item_code),
-  INDEX idx_category (category_id),
-  INDEX idx_status (status)
+  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE
+  SET NULL,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE
+  SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE
+  SET NULL,
+    INDEX idx_item_code (item_code),
+    INDEX idx_category (category_id),
+    INDEX idx_status (status)
 );
-
 -- =====================================================
 -- Stock In
 -- =====================================================
@@ -96,12 +99,13 @@ CREATE TABLE stock_in (
   notes TEXT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (item_id) REFERENCES inventory_items(id) ON DELETE CASCADE,
-  FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
-  FOREIGN KEY (received_by) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_item (item_id),
-  INDEX idx_date (received_date)
+  FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE
+  SET NULL,
+    FOREIGN KEY (received_by) REFERENCES users(id) ON DELETE
+  SET NULL,
+    INDEX idx_item (item_id),
+    INDEX idx_date (received_date)
 );
-
 -- =====================================================
 -- Stock Out
 -- =====================================================
@@ -117,11 +121,11 @@ CREATE TABLE stock_out (
   notes TEXT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (item_id) REFERENCES inventory_items(id) ON DELETE CASCADE,
-  FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_item (item_id),
-  INDEX idx_date (out_date)
+  FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE
+  SET NULL,
+    INDEX idx_item (item_id),
+    INDEX idx_date (out_date)
 );
-
 -- =====================================================
 -- Borrow & Return
 -- =====================================================
@@ -141,11 +145,11 @@ CREATE TABLE borrows (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (item_id) REFERENCES inventory_items(id) ON DELETE CASCADE,
-  FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_status (status),
-  INDEX idx_borrow_date (borrow_date)
+  FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE
+  SET NULL,
+    INDEX idx_status (status),
+    INDEX idx_borrow_date (borrow_date)
 );
-
 -- =====================================================
 -- SME Products & Samples
 -- =====================================================
@@ -165,9 +169,9 @@ CREATE TABLE sme_products (
   recorded_by INT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE SET NULL
+  FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE
+  SET NULL
 );
-
 -- =====================================================
 -- Activity Log
 -- =====================================================
@@ -180,12 +184,12 @@ CREATE TABLE activity_log (
   entity_name VARCHAR(200),
   details TEXT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_user (user_id),
-  INDEX idx_entity (entity_type, entity_id),
-  INDEX idx_created (created_at)
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE
+  SET NULL,
+    INDEX idx_user (user_id),
+    INDEX idx_entity (entity_type, entity_id),
+    INDEX idx_created (created_at)
 );
-
 -- =====================================================
 -- Settings
 -- =====================================================
@@ -195,32 +199,66 @@ CREATE TABLE settings (
   setting_value TEXT,
   updated_by INT,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+  FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE
+  SET NULL
 );
-
 -- =====================================================
 -- Seed Data
 -- =====================================================
-
 -- Default admin user (password: admin123)
-INSERT INTO users (full_name, email, password_hash, role) VALUES
-('System Admin', 'admin@innolab.kh', '$2b$10$placeholder_hash_replace_on_first_run', 'admin');
-
+INSERT INTO users (full_name, email, password_hash, role)
+VALUES (
+    'System Admin',
+    'admin@innolab.kh',
+    '$2b$10$placeholder_hash_replace_on_first_run',
+    'admin'
+  );
 -- Default categories
-INSERT INTO categories (name, description, color) VALUES
-('Office Supplies', 'Pens, paper, stationery, and other daily office supplies', '#367A43'),
-('Electronics', 'Laptops, monitors, keyboards, and other electronic equipment', '#2563EB'),
-('Furniture', 'Desks, chairs, shelves, and other office furniture', '#7C3AED'),
-('Packaging Materials', 'Boxes, bags, labels, and packaging supplies', '#D99A28'),
-('SME Samples', 'Product samples received from SMEs', '#059669'),
-('Cleaning Supplies', 'Cleaning products and sanitation materials', '#EC4899'),
-('Printing Materials', 'Ink, toner, and printing paper', '#F59E0B'),
-('Kitchen Supplies', 'Utensils, coffee, and kitchen consumables', '#EF4444');
-
+INSERT INTO categories (name, description, color)
+VALUES (
+    'Office Supplies',
+    'Pens, paper, stationery, and other daily office supplies',
+    '#367A43'
+  ),
+  (
+    'Electronics',
+    'Laptops, monitors, keyboards, and other electronic equipment',
+    '#2563EB'
+  ),
+  (
+    'Furniture',
+    'Desks, chairs, shelves, and other office furniture',
+    '#7C3AED'
+  ),
+  (
+    'Packaging Materials',
+    'Boxes, bags, labels, and packaging supplies',
+    '#D99A28'
+  ),
+  (
+    'SME Samples',
+    'Product samples received from SMEs',
+    '#059669'
+  ),
+  (
+    'Cleaning Supplies',
+    'Cleaning products and sanitation materials',
+    '#EC4899'
+  ),
+  (
+    'Printing Materials',
+    'Ink, toner, and printing paper',
+    '#F59E0B'
+  ),
+  (
+    'Kitchen Supplies',
+    'Utensils, coffee, and kitchen consumables',
+    '#EF4444'
+  );
 -- Default settings
-INSERT INTO settings (setting_key, setting_value) VALUES
-('company_name', 'InnoLab Kampong Thom'),
-('low_stock_threshold', '10'),
-('currency', 'USD'),
-('date_format', 'YYYY-MM-DD'),
-('items_per_page', '20');
+INSERT INTO settings (setting_key, setting_value)
+VALUES ('company_name', 'InnoLab Kampong Thom'),
+  ('low_stock_threshold', '10'),
+  ('currency', 'USD'),
+  ('date_format', 'YYYY-MM-DD'),
+  ('items_per_page', '20');

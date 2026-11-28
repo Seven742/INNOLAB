@@ -150,7 +150,7 @@ export default function ImageUpload({
             />
 
             {/* Cloudinary or Local Pill Badge */}
-            {isCloudinary ? (
+            {/* {isCloudinary ? (
               <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-950/85 border border-cyan-400/40 text-cyan-300 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                 Cloudinary
@@ -160,12 +160,12 @@ export default function ImageUpload({
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                 Local
               </div>
-            ) : null}
+            ) : null} */}
 
             {/* Hover Actions Overlay */}
             <div className="absolute inset-0 bg-black/65 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-xl flex items-center justify-center gap-2 backdrop-blur-xs">
-              <span className="text-white text-xs font-semibold bg-white/15 px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/25 flex items-center gap-1 hover:bg-white/25 transition-colors">
-                <RefreshCw className="h-3 w-3" /> Change
+              <span title='Change photo' className="text-white text-xs font-semibold bg-white/15 px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/25 flex items-center gap-1 hover:bg-white/25 transition-colors">
+                <RefreshCw className="h-4 w-4" />
               </span>
               <button
                 type="button"
@@ -189,16 +189,16 @@ export default function ImageUpload({
             <p className="text-[10px] text-text-muted mt-0.5">Auto-optimizing format</p>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center p-4 text-center">
+          <div className="flex flex-col items-center justify-center p-2 text-center">
             <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-2.5 border border-cyan-500/25 group-hover:scale-110 group-hover:bg-cyan-500/20 group-hover:shadow-[0_0_15px_rgba(0,168,178,0.3)] transition-all duration-200">
               <Upload className="h-5 w-5" />
             </div>
-            <p className="text-xs font-bold text-text-main group-hover:text-primary dark:group-hover:text-cyan-300 transition-colors">
+            {/* <p className="text-xs font-bold text-text-main group-hover:text-primary dark:group-hover:text-cyan-300 transition-colors">
               Upload Item Photo
-            </p>
-            <p className="text-[10px] text-text-muted mt-1 leading-tight">
+            </p> */}
+            <p className="text-[10px] text-text-muted  leading-tight">
               Drag & drop or browse<br />
-              <span className="text-cyan-400/80">Permanent Cloudinary Storage</span>
+              {/* <span className="text-cyan-400/80">Permanent Cloudinary Storage</span> */}
             </p>
           </div>
         )}
